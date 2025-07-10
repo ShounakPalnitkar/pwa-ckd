@@ -1,96 +1,73 @@
-// Service Worker Registration
-function registerServiceWorker() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-                console.log('Service Worker registered with scope:', registration.scope);
-                
-                // Check for updates periodically
-                setInterval(() => {
-                    registration.update().catch(err => {
-                        console.log('Service Worker update check failed:', err);
-                    });
-                }, 60 * 60 * 1000); // Check every hour
-                
-                // Listen for updates
-                registration.addEventListener('updatefound', () => {
-                    const newWorker = registration.installing;
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            showUpdateNotification();
-                        }
-                    });
-                });
-            })
-            .catch(err => {
-                console.error('Service Worker registration failed:', err);
-            });
-    }
-}
+// Track the install prompt event
+let deferredPrompt;
+let installButton = document.getElementById('install-btn');
 
-// Show update notification
-function showUpdateNotification() {
-    const notification = document.createElement('div');
-    notification.className = 'update-notification';
-    notification.innerHTML = `
-        <p>New version available!</p>
-        <button id="refresh-btn">Refresh</button>
-    `;
-    document.body.appendChild(notification);
+// Show install button when PWA can be installed
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent Chrome 67 and earlier from automatically showing the prompt
+    e.preventDefault();
+    // Stash the event so it can be triggered later
+    deferredPrompt = e;
     
-    document.getElementById('refresh-btn').addEventListener('click', () => {
-        window.location.reload();
-    });
-}
-
-// Handle PWA installation
-function setupInstallPrompt() {
-    let deferredPrompt;
-    const installButton = document.getElementById('install-btn');
-    
-    if (!installButton) return;
-    
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installButton.style.display = 'block';
+    // Show and animate the install button
+    if (installButton) {
+        installButton.classList.remove('hidden');
+        installButton.classList.add('pulse');
         
-        installButton.addEventListener('click', () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(choiceResult => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted install');
-                        installButton.style.display = 'none';
-                        // Track installation in analytics if needed
-                    }
-                    deferredPrompt = null;
-                });
+        // Hide after 30 seconds if not clicked
+        setTimeout(() => {
+            if (installButton && !installButton.classList.contains('clicked')) {
+                installButton.classList.remove('pulse');
+                installButton.classList.add('hidden');
             }
+        }, 30000);
+    }
+});
+
+// Handle install button click
+if (installButton) {
+    installButton.addEventListener('click', (e) => {
+        if (!deferredPrompt) return;
+        
+        // Show the install prompt
+        deferredPrompt.prompt();
+        
+        // Track the user's choice
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+                // Track in analytics if needed
+                installButton.classList.add('clicked');
+                installButton.innerHTML = '<i class="fas fa-check"></i> Installed!';
+                setTimeout(() => {
+                    installButton.classList.remove('pulse');
+                    installButton.classList.add('hidden');
+                }, 2000);
+            } else {
+                console.log('User dismissed the install prompt');
+                // You might want to show the button again later
+                setTimeout(() => {
+                    installButton.classList.remove('pulse');
+                    installButton.classList.add('hidden');
+                }, 1000);
+            }
+            deferredPrompt = null;
         });
     });
-    
-    window.addEventListener('appinstalled', () => {
-        console.log('App installed successfully');
-        if (installButton) installButton.style.display = 'none';
-    });
 }
 
-// Initialize PWA features
-function initPWA() {
-    registerServiceWorker();
-    setupInstallPrompt();
-    
-    // Detect standalone mode
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        document.body.classList.add('pwa-mode');
+// Hide install button when app is already installed
+window.addEventListener('appinstalled', () => {
+    console.log('PWA was installed');
+    if (installButton) {
+        installButton.classList.remove('pulse');
+        installButton.classList.add('hidden');
     }
-    
-    // Detect if launched from home screen
-    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('Launched from home screen');
+});
+
+// Check if running as PWA and hide button if so
+if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (installButton) {
+        installButton.classList.add('hidden');
     }
 }
-
-// Start PWA features when DOM is loaded
-document.addEventListener('DOMContentLoaded', initPWA);
