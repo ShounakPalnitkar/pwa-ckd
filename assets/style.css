@@ -1,0 +1,93 @@
+:root {
+    --primary-color: #1a6fc9;
+    --primary-dark: #145da0;
+    --secondary-color: #27ae60;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --light-gray: #f5f9fc;
+    --medium-gray: #e0e6ed;
+    --dark-gray: #95a5a6;
+    --white: #ffffff;
+    --text-color: #333333;
+    --text-light: #666666;
+    --security-color: #8e44ad;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--light-gray);
+}
+
+header {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Continue with all other CSS rules from your index-ckd.html */
+/* ... (include all the remaining CSS from your original file) ... */
+
+/* Add this at the end to maintain existing styles */
+@media (max-width: 768px) {
+    .visualization-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .download-buttons {
+        flex-direction: column;
+    }
+    
+    .symptoms-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
+        height: 280px;
+    }
+    
+    #chatbot-iframe {
+        width: 320px;
+        height: 480px;
+    }
+    
+    body {
+        padding: 15px;
+    }
+    
+    .form-section, #result, #visualizations, #welcome-screen {
+        padding: 20px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    h2 {
+        font-size: 1.4rem;
+    }
+
+    .modal-content {
+        max-width: 95%;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    #chatbot-iframe {
+        width: 280px;
+        height: 420px;
+    }
+    
+    .chart-container {
+        height: 240px;
+    }
+}
