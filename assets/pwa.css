@@ -1,0 +1,69 @@
+/* PWA-specific styles */
+#install-btn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 1001;
+}
+
+#install-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+#install-btn i {
+    margin-right: 8px;
+}
+
+/* PWA mode adjustments */
+body.pwa-mode {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+body.pwa-mode header {
+    padding-top: calc(25px + env(safe-area-inset-top));
+    border-radius: 0;
+    margin-bottom: 15px;
+}
+
+body.pwa-mode #chatbot-container {
+    bottom: calc(25px + env(safe-area-inset-bottom));
+}
+
+/* Status bar background for iOS */
+body.pwa-mode::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top);
+    background-color: var(--primary-dark);
+    z-index: 9999;
+}
+
+/* Fullscreen adjustments */
+@media (display-mode: standalone) {
+    body {
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    
+    button, input, select {
+        font-size: 16px; /* Prevent iOS zooming */
+    }
+}
